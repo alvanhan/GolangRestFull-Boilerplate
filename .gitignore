@@ -1,0 +1,62 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go workspace
+go.work
+go.work.sum
+
+# Environment files (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# IDE and editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Build artifacts
+dist/
+tmp/
+
+# Temp upload directory
+/tmp/uploads/
+
+# Log files
+*.log
+logs/
+
+# Air live reload
+.air.toml
+tmp/
+
+# golangci-lint cache
+.golangci-cache/
+
+# Mock generated files (can be regenerated)
+# mocks/
+
+# Swagger generated docs
+docs/swagger.json
+docs/swagger.yaml
