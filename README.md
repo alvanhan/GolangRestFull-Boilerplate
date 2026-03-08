@@ -287,6 +287,16 @@ docker ps
 
 All containers should show `(healthy)` status.
 
+### Step 6 — Run seed data
+
+This step is run **once** during initial setup. It inserts the default system users, root folders, and permissions.
+
+```bash
+make seed
+```
+
+### Step 7 — Verify API
+
 ```bash
 curl http://localhost:8080/health
 ```
@@ -322,7 +332,7 @@ docker compose down
 docker compose down -v --remove-orphans
 ```
 
-> **Warning:** The `-v` flag deletes all Docker volumes. All database data, Redis data, and stored files will be permanently deleted.
+> **Warning:** The `-v` flag deletes all Docker volumes. All database data, Redis data, and stored files will be permanently deleted. After a full reset, run `make seed` again to restore the default system users.
 
 ### Rebuild API only (after code changes)
 
@@ -596,6 +606,7 @@ make mock
 | `make test-unit` | Run unit tests only |
 | `make migrate-up` | Apply all pending SQL migrations |
 | `make migrate-down` | Rollback the last migration |
+| `make seed` | Insert seed data (default users + folders) |
 | `make docker-up` | Start all Docker services |
 | `make docker-down` | Stop all Docker services |
 | `make docker-logs` | Follow API container logs |

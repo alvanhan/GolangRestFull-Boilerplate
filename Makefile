@@ -20,7 +20,7 @@ VERSION    ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "
 BUILD_TIME ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS    := -w -s -X 'main.Version=$(VERSION)' -X 'main.BuildTime=$(BUILD_TIME)'
 
-.PHONY: all help run build test test-unit migrate-up migrate-down \
+.PHONY: all help run build test test-unit migrate-up migrate-down seed \
         docker-up docker-down docker-logs lint tidy swag mock clean gen-secret
 
 all: build
@@ -68,6 +68,10 @@ migrate-up: ## Run all pending migrations
 
 migrate-down: ## Rollback the last applied migration
 	migrate -path $(MIGRATIONS_DIR) -database "$(DB_URL)" down 1
+
+seed: ## Run seed data (002_seed.sql) into the running postgres container
+	docker exec -i file-management-postgres psql -U $(DB_USER) -d $(DB_NAME) < $(MIGRATIONS_DIR)/002_seed.sql
+	@echo "Seed data applied successfully"
 
 # -----------------------------------------------------------------------------
 # Docker
