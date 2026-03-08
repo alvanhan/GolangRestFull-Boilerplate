@@ -247,8 +247,8 @@ CORS_ALLOWED_HEADERS=Origin,Content-Type,Accept,Authorization,X-Request-ID
 ### Step 1 — Clone the repository
 
 ```bash
-git clone [<repository-url>](https://github.com/alvanhan/GolangRestFull-Boilerplate)
-cd [<repository-directory>](https://github.com/alvanhan/GolangRestFull-Boilerplate)
+git clone https://github.com/alvanhan/GolangRestFull-Boilerplate
+cd GolangRestFull-Boilerplate
 ```
 
 ### Step 2 — Configure environment
