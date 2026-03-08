@@ -16,17 +16,14 @@ const (
 	ContextKeyClaims = "claims"
 )
 
-// AuthMiddleware validates JWT tokens on protected routes.
 type AuthMiddleware struct {
 	jwtService pkgjwt.JWTService
 }
 
-// NewAuthMiddleware creates a new AuthMiddleware.
 func NewAuthMiddleware(jwtService pkgjwt.JWTService) *AuthMiddleware {
 	return &AuthMiddleware{jwtService: jwtService}
 }
 
-// Authenticate is a Fiber middleware that validates the Bearer JWT token.
 func (m *AuthMiddleware) Authenticate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := extractBearerToken(c)
@@ -48,7 +45,6 @@ func (m *AuthMiddleware) Authenticate() fiber.Handler {
 	}
 }
 
-// OptionalAuthenticate parses the token if present but does not fail if absent.
 func (m *AuthMiddleware) OptionalAuthenticate() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := extractBearerToken(c)
@@ -70,19 +66,16 @@ func (m *AuthMiddleware) OptionalAuthenticate() fiber.Handler {
 	}
 }
 
-// GetUserID retrieves the authenticated user ID from fiber context.
 func GetUserID(c *fiber.Ctx) string {
 	id, _ := c.Locals(ContextKeyUserID).(string)
 	return id
 }
 
-// GetUserRole retrieves the authenticated user role from fiber context.
 func GetUserRole(c *fiber.Ctx) string {
 	role, _ := c.Locals(ContextKeyRole).(string)
 	return role
 }
 
-// GetUserEmail retrieves the authenticated user email from fiber context.
 func GetUserEmail(c *fiber.Ctx) string {
 	email, _ := c.Locals(ContextKeyEmail).(string)
 	return email

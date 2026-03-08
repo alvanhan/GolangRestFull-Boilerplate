@@ -16,13 +16,11 @@ import (
 	"file-management-service/pkg/response"
 )
 
-// NotificationHandler handles notification REST + SSE endpoints.
 type NotificationHandler struct {
 	notifUC   notification.UseCase
 	publisher *notifinfra.Publisher
 }
 
-// NewNotificationHandler creates a new NotificationHandler.
 func NewNotificationHandler(notifUC notification.UseCase, publisher *notifinfra.Publisher) *NotificationHandler {
 	return &NotificationHandler{notifUC: notifUC, publisher: publisher}
 }
@@ -140,22 +138,18 @@ func (h *NotificationHandler) Stream(c *fiber.Ctx) error {
 		return response.Unauthorized(c, "authentication required")
 	}
 
-	// Set SSE headers.
 	c.Set(fiber.HeaderContentType, "text/event-stream")
 	c.Set(fiber.HeaderCacheControl, "no-cache")
 	c.Set("Connection", "keep-alive")
 	c.Set("X-Accel-Buffering", "no") // disable nginx buffering
 
-	// Subscribe to Redis pub/sub channel for this user.
 	ctx := c.Context()
 	pubsub := h.publisher.Subscribe(c.Context(), userID)
 	defer pubsub.Close()
 
 	ch := pubsub.Channel()
 
-	// Stream writer.
 	c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
-		// Send a connected event immediately.
 		connected := map[string]interface{}{
 			"type":      "connected",
 			"user_id":   userID,
@@ -200,7 +194,6 @@ func (h *NotificationHandler) Stream(c *fiber.Ctx) error {
 	return nil
 }
 
-// writeSSEEvent writes a single Server-Sent Event to the buffered writer.
 func writeSSEEvent(w *bufio.Writer, event string, data interface{}) {
 	payload, err := json.Marshal(data)
 	if err != nil {

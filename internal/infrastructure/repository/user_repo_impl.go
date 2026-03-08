@@ -85,7 +85,6 @@ func (r *userRepository) Update(ctx context.Context, user *entity.User) error {
 	return nil
 }
 
-// Delete soft-deletes the user by setting deleted_at to now.
 func (r *userRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	now := time.Now()
 	result := r.db.WithContext(ctx).
@@ -216,7 +215,6 @@ func (r *userRepository) DeleteExpiredTokens(ctx context.Context) error {
 	return nil
 }
 
-// applyOrder appends an ORDER BY clause. Falls back to defaultOrder when orderBy is empty.
 func applyOrder(query *gorm.DB, orderBy, orderDir, defaultOrder string) *gorm.DB {
 	if orderBy == "" {
 		return query.Order(defaultOrder)

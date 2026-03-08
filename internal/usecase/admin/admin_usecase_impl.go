@@ -18,7 +18,6 @@ type useCaseImpl struct {
 	fileRepo repository.FileRepository
 }
 
-// NewUseCase constructs the admin UseCase implementation.
 func NewUseCase(
 	userRepo repository.UserRepository,
 	fileRepo repository.FileRepository,

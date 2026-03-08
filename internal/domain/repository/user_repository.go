@@ -19,7 +19,6 @@ type UserRepository interface {
 	UpdateStorageUsed(ctx context.Context, userID uuid.UUID, delta int64) error
 	UpdateLastLogin(ctx context.Context, userID uuid.UUID, ip string) error
 
-	// Refresh token management
 	CreateRefreshToken(ctx context.Context, token *entity.RefreshToken) error
 	GetRefreshToken(ctx context.Context, tokenHash string) (*entity.RefreshToken, error)
 	RevokeRefreshToken(ctx context.Context, tokenHash string) error

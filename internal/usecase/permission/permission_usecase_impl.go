@@ -26,7 +26,6 @@ type useCaseImpl struct {
 	notif      NotificationSender
 }
 
-// NewUseCase constructs the permission UseCase implementation.
 func NewUseCase(
 	permRepo repository.PermissionRepository,
 	fileRepo repository.FileRepository,
@@ -43,7 +42,6 @@ func NewUseCase(
 	}
 }
 
-// Grant creates a single permission grant on a resource.
 func (uc *useCaseImpl) Grant(
 	ctx context.Context,
 	grantedByID string,
@@ -95,7 +93,6 @@ func (uc *useCaseImpl) Grant(
 	return toPermissionResponse(perm), nil
 }
 
-// Revoke removes a single permission grant by its ID.
 func (uc *useCaseImpl) Revoke(
 	ctx context.Context,
 	revokerID, permissionID string,
@@ -130,7 +127,6 @@ func (uc *useCaseImpl) Revoke(
 	return nil
 }
 
-// List returns all permission grants on a resource.
 func (uc *useCaseImpl) List(
 	ctx context.Context,
 	callerID, resourceID, resourceType string,
@@ -162,7 +158,6 @@ func (uc *useCaseImpl) List(
 	return &ListPermissionsResponse{Permissions: resp, Total: int64(len(resp))}, nil
 }
 
-// Check reports whether a user has the requested permission on a resource.
 func (uc *useCaseImpl) Check(
 	ctx context.Context,
 	req *CheckPermissionRequest,
@@ -189,7 +184,6 @@ func (uc *useCaseImpl) Check(
 	return &CheckPermissionResponse{Allowed: allowed}, nil
 }
 
-// GrantBulk atomically grants multiple permissions on the same resource.
 func (uc *useCaseImpl) GrantBulk(
 	ctx context.Context,
 	grantedByID string,
@@ -244,10 +238,6 @@ func (uc *useCaseImpl) GrantBulk(
 	return resp, nil
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
 func (uc *useCaseImpl) logAudit(
 	ctx context.Context,
 	userID, resourceID uuid.UUID,
@@ -274,7 +264,6 @@ func (uc *useCaseImpl) logAudit(
 	}
 }
 
-// toPermissionResponse converts a domain Permission entity to its DTO.
 func toPermissionResponse(p *entity.Permission) *PermissionResponse {
 	return &PermissionResponse{
 		ID:           p.ID.String(),

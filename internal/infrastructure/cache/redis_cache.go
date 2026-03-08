@@ -26,7 +26,6 @@ func (c *RedisCache) Set(ctx context.Context, key string, value interface{}, ttl
 	return c.client.Set(ctx, key, data, ttl).Err()
 }
 
-// Get retrieves a cached value and unmarshals it into dest. Returns an error if the key is not found.
 func (c *RedisCache) Get(ctx context.Context, key string, dest interface{}) error {
 	data, err := c.client.Get(ctx, key).Bytes()
 	if err != nil {
@@ -79,7 +78,6 @@ func (c *RedisCache) DeleteUserSession(ctx context.Context, userID string) error
 	return c.Delete(ctx, c.CacheKey("session", userID))
 }
 
-// CacheKey joins the given parts with ":" to form a namespaced cache key.
 func (c *RedisCache) CacheKey(parts ...string) string {
 	return strings.Join(parts, ":")
 }

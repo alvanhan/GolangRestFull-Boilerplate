@@ -92,7 +92,6 @@ func (r *permissionRepository) GetByUserAndResource(ctx context.Context, userID 
 	return perms, nil
 }
 
-// HasPermission checks whether a non-expired permission record exists for the given combination.
 func (r *permissionRepository) HasPermission(ctx context.Context, userID uuid.UUID, resourceID uuid.UUID, resourceType entity.ResourceType, action entity.PermissionAction) (bool, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&entity.Permission{}).
@@ -127,8 +126,6 @@ func (r *permissionRepository) RevokeBulk(ctx context.Context, ids []uuid.UUID) 
 	}
 	return nil
 }
-
-// ─── Share Link ──────────────────────────────────────────────────────────────
 
 func (r *permissionRepository) CreateShareLink(ctx context.Context, link *entity.ShareLink) error {
 	if err := r.db.WithContext(ctx).Create(link).Error; err != nil {

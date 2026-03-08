@@ -12,10 +12,8 @@ import (
 
 const headerRequestID = "X-Request-ID"
 
-// RequestLogger returns a Fiber middleware that logs every request via zap.
 func RequestLogger() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Ensure request ID exists.
 		reqID := c.Get(headerRequestID)
 		if reqID == "" {
 			reqID = uuid.New().String()

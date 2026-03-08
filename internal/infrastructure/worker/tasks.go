@@ -7,7 +7,6 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-// Task type constants.
 const (
 	TypeFileProcessing     = "file:processing"
 	TypeFileCleanup        = "file:cleanup"

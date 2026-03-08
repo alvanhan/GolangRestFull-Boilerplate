@@ -51,7 +51,6 @@ func (p *PostgresDB) Close() error {
 	return sqlDB.Close()
 }
 
-// AutoMigrate runs GORM auto-migration for all domain entities.
 func (p *PostgresDB) AutoMigrate() error {
 	return p.DB.AutoMigrate(
 		&entity.User{},
@@ -67,7 +66,6 @@ func (p *PostgresDB) AutoMigrate() error {
 	)
 }
 
-// Health checks database connectivity via a ping.
 func (p *PostgresDB) Health() error {
 	sqlDB, err := p.DB.DB()
 	if err != nil {

@@ -14,7 +14,6 @@ import (
 	"file-management-service/internal/infrastructure/worker"
 )
 
-// ─── Storage adapter ──────────────────────────────────────────────────────────
 // storageAdapter wraps *minstorage.MinioStorage and satisfies the
 // file.StorageService interface expected by the file use case.
 
@@ -55,7 +54,6 @@ func (a *storageAdapter) AbortMultipartUpload(_ context.Context, _, _ string) er
 	return nil
 }
 
-// ─── Worker adapter ───────────────────────────────────────────────────────────
 // workerAdapter wraps *worker.Client and satisfies file.WorkerClient.
 
 type workerAdapter struct{ c *worker.Client }
@@ -75,7 +73,6 @@ func (a *workerAdapter) EnqueueNotification(_ context.Context, userID uuid.UUID,
 	}, asynq.Queue("default"))
 }
 
-// ─── Notification adapter ─────────────────────────────────────────────────────
 // notifAdapter wraps *notifinfra.Publisher and satisfies file.NotificationService.
 
 type notifAdapter struct{ p *notifinfra.Publisher }

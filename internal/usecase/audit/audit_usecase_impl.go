@@ -17,7 +17,6 @@ type useCaseImpl struct {
 	auditRepo repository.AuditRepository
 }
 
-// NewUseCase constructs the audit UseCase implementation.
 func NewUseCase(auditRepo repository.AuditRepository) UseCase {
 	return &useCaseImpl{auditRepo: auditRepo}
 }
@@ -149,7 +148,6 @@ func buildRepoFilter(filter *AuditListFilter) repository.AuditFilter {
 	return repoFilter
 }
 
-// toAuditLogResponse converts a domain AuditLog entity to its DTO.
 func toAuditLogResponse(l *entity.AuditLog) *AuditLogResponse {
 	resp := &AuditLogResponse{
 		ID:           l.ID.String(),

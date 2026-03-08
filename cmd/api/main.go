@@ -62,7 +62,6 @@ func main() {
 	// required environment variable, so no explicit error check is needed here.
 	cfg := config.Load()
 
-	// 2. Initialise structured logger (zap under the hood).
 	if err := logger.Init(cfg.Log.Level, cfg.Log.Format, cfg.Log.Output); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to initialise logger: %v\n", err)
 		os.Exit(1)
@@ -76,7 +75,6 @@ func main() {
 		zap.Int("port", cfg.App.Port),
 	)
 
-	// 3. Connect to PostgreSQL via GORM / pgx driver.
 	db, err := database.NewPostgres(&cfg.Database)
 	if err != nil {
 		logger.Fatal("Failed to connect to PostgreSQL", zap.Error(err))
@@ -96,7 +94,6 @@ func main() {
 	}
 	defer redisClient.Close()
 
-	// 6. Initialise MinIO object storage and ensure the application bucket exists.
 	minioStorage, err := storage.NewMinioStorage(&cfg.MinIO)
 	if err != nil {
 		logger.Fatal("Failed to initialise MinIO storage", zap.Error(err))
@@ -110,14 +107,12 @@ func main() {
 	}
 	logger.Info("MinIO storage ready", zap.String("bucket", cfg.MinIO.BucketName))
 
-	// 7. Initialise the Redis-backed cache layer.
 	_ = cache.NewRedisCache(redisClient.Client)
 
 	// 8. Initialise the Redis pub/sub notification publisher.
 	// Delivers real-time events to connected SSE clients.
 	notifPublisher := notification.NewPublisher(redisClient.Client)
 
-	// 9. Initialise the Asynq worker client for enqueuing background tasks.
 	redisOpt := asynq.RedisClientOpt{
 		Addr:     cfg.Redis.GetRedisAddr(),
 		Password: cfg.Redis.Password,
@@ -125,7 +120,6 @@ func main() {
 	workerClient := worker.NewClient(redisOpt)
 	defer workerClient.Close()
 
-	// 10. Initialise all repository implementations (GORM + PostgreSQL).
 	userRepo := repository.NewUserRepository(db.DB)
 	fileRepo := repository.NewFileRepository(db.DB)
 	folderRepo := repository.NewFolderRepository(db.DB)
@@ -133,7 +127,6 @@ func main() {
 	auditRepo := repository.NewAuditRepository(db.DB)
 	notifRepo := repository.NewNotificationRepository(db.DB)
 
-	// 11. Initialise the JWT service for access and refresh token lifecycle.
 	jwtService := jwt.NewJWTService(
 		cfg.JWT.AccessSecret,
 		cfg.JWT.RefreshSecret,
@@ -141,10 +134,8 @@ func main() {
 		cfg.JWT.RefreshExpiry,
 	)
 
-	// 12. Initialise the input validator (go-playground/validator wrapper).
 	v := validator.New()
 
-	// 13. Wire use cases with their required dependencies.
 	authUC := auth.NewUseCase(userRepo, jwtService)
 	fileUC := fileuc.NewUseCase(
 		fileRepo, folderRepo, permRepo, userRepo, auditRepo,
@@ -154,7 +145,6 @@ func main() {
 	permUC := permission.NewUseCase(permRepo, fileRepo, folderRepo, auditRepo, notifPublisher)
 	notifUC := notifuc.NewUseCase(notifRepo)
 
-	// 14. Wire HTTP handlers with their use cases and supporting services.
 	authHandler := handler.NewAuthHandler(authUC, v)
 	fileHandler := handler.NewFileHandler(fileUC, v, &cfg.Upload)
 	folderHandler := handler.NewFolderHandler(folderUC, v)
@@ -163,11 +153,9 @@ func main() {
 	auditHandler := handler.NewAuditHandler(auditRepo, v)
 	adminHandler := handler.NewAdminHandler(userRepo, fileRepo, v)
 
-	// 15. Initialise HTTP middleware.
 	authMW := middleware.NewAuthMiddleware(jwtService)
 	rbacMW := middleware.NewRBACMiddleware()
 
-	// 16. Build the Fiber application with all routes registered.
 	r := router.NewRouter(
 		cfg,
 		authHandler, fileHandler, folderHandler,
@@ -177,7 +165,6 @@ func main() {
 	)
 	app := r.Setup()
 
-	// 17. Start the Asynq background task processor.
 	processor := worker.NewProcessor(&cfg.Worker, redisOpt)
 	fileProcessingHandler := worker.NewFileProcessingHandler()
 	notifWorkerHandler := worker.NewNotificationHandler(notifPublisher, notifRepo)
@@ -194,13 +181,11 @@ func main() {
 	}()
 	defer processor.Stop()
 
-	// 18. Start the cron scheduler for periodic maintenance jobs.
 	scheduler := worker.NewScheduler(workerClient)
 	scheduler.RegisterJobs()
 	scheduler.Start()
 	defer scheduler.Stop()
 
-	// 19. Start the HTTP server in a non-blocking goroutine.
 	serverAddr := fmt.Sprintf(":%d", cfg.App.Port)
 	go func() {
 		logger.Info("HTTP server listening", zap.String("addr", serverAddr))
@@ -209,8 +194,6 @@ func main() {
 		}
 	}()
 
-	// 20. Block until a termination signal is received (Ctrl+C or SIGTERM from
-	// the OS / container runtime), then perform a graceful shutdown.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	sig := <-quit

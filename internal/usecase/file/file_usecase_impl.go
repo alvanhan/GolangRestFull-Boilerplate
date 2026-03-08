@@ -26,17 +26,14 @@ const chunkUploadTTL = 24 * time.Hour
 
 // StorageService abstracts the object-storage backend.
 type StorageService interface {
-	// Upload stores a complete object.
 	Upload(ctx context.Context, key string, reader io.Reader, size int64, mimeType string) error
 	// Download retrieves a readable stream for a stored object.
 	Download(ctx context.Context, key string) (io.ReadCloser, int64, error)
-	// Delete removes a stored object permanently.
 	Delete(ctx context.Context, key string) error
 	// GetPresignedURL returns a time-limited pre-signed URL for direct download.
 	GetPresignedURL(ctx context.Context, key string, expiry time.Duration) (string, error)
 	// Copy duplicates an object to a new key within the same bucket.
 	Copy(ctx context.Context, srcKey, dstKey string) error
-	// UploadChunk stores a single part of a multipart upload.
 	UploadChunk(ctx context.Context, uploadID, key string, chunkIndex int, reader io.Reader, size int64) error
 	// CompleteMultipartUpload assembles parts into the final object.
 	CompleteMultipartUpload(ctx context.Context, uploadID, key string, totalChunks int) error
@@ -69,7 +66,6 @@ type useCaseImpl struct {
 	uploadCfg  *config.UploadConfig
 }
 
-// NewUseCase constructs the file UseCase implementation.
 func NewUseCase(
 	fileRepo repository.FileRepository,
 	folderRepo repository.FolderRepository,
@@ -93,10 +89,6 @@ func NewUseCase(
 		uploadCfg:  uploadCfg,
 	}
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Upload
-// ─────────────────────────────────────────────────────────────────────────────
 
 func (uc *useCaseImpl) Upload(
 	ctx context.Context,
@@ -176,10 +168,6 @@ func (uc *useCaseImpl) Upload(
 
 	return toFileResponse(f), nil
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Chunked upload
-// ─────────────────────────────────────────────────────────────────────────────
 
 func (uc *useCaseImpl) InitChunkUpload(
 	ctx context.Context,
@@ -271,10 +259,6 @@ func (uc *useCaseImpl) CompleteChunkUpload(
 	return toFileResponse(f), nil
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Download / URL
-// ─────────────────────────────────────────────────────────────────────────────
-
 func (uc *useCaseImpl) Download(
 	ctx context.Context,
 	userID, fileID string,
@@ -314,10 +298,6 @@ func (uc *useCaseImpl) GetPresignedURL(
 	}
 	return url, nil
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Mutating operations
-// ─────────────────────────────────────────────────────────────────────────────
 
 func (uc *useCaseImpl) Delete(ctx context.Context, userID, fileID string) error {
 	f, err := uc.resolveFileWithAccess(ctx, userID, fileID, entity.ActionDelete)
@@ -455,10 +435,6 @@ func (uc *useCaseImpl) Copy(
 	return toFileResponse(newFile), nil
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Queries
-// ─────────────────────────────────────────────────────────────────────────────
-
 func (uc *useCaseImpl) GetByID(ctx context.Context, userID, fileID string) (*FileResponse, error) {
 	f, err := uc.resolveFileWithAccess(ctx, userID, fileID, entity.ActionRead)
 	if err != nil {
@@ -519,10 +495,6 @@ func (uc *useCaseImpl) Search(ctx context.Context, userID, query string) ([]*Fil
 	return resp, nil
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Share
-// ─────────────────────────────────────────────────────────────────────────────
-
 func (uc *useCaseImpl) Share(
 	ctx context.Context,
 	userID, fileID string,
@@ -582,10 +554,6 @@ func (uc *useCaseImpl) Share(
 		CreatedAt: now,
 	}, nil
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Versions
-// ─────────────────────────────────────────────────────────────────────────────
 
 func (uc *useCaseImpl) GetVersions(
 	ctx context.Context,
@@ -664,10 +632,6 @@ func (uc *useCaseImpl) RestoreVersion(
 	return toFileResponse(f), nil
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
 // resolveFileWithAccess fetches a file and verifies the caller has the required
 // permission (owner always has full access).
 func (uc *useCaseImpl) resolveFileWithAccess(
@@ -694,7 +658,6 @@ func (uc *useCaseImpl) resolveFileWithAccess(
 		return f, nil
 	}
 
-	// Check explicit permission grant.
 	allowed, err := uc.permRepo.HasPermission(ctx, uid, fid, entity.ResourceTypeFile, action)
 	if err != nil {
 		return nil, errors.InternalServer(err)
@@ -720,7 +683,6 @@ func (uc *useCaseImpl) publishFileEvent(
 	}
 }
 
-// toRepoFileFilter maps the use-case filter to the repository filter type.
 func toRepoFileFilter(ownerID uuid.UUID, folderID *uuid.UUID, f *FileListFilter) repository.FileFilter {
 	filter := repository.FileFilter{
 		OwnerID:  &ownerID,
@@ -751,7 +713,6 @@ func toRepoFileFilter(ownerID uuid.UUID, folderID *uuid.UUID, f *FileListFilter)
 	return filter
 }
 
-// toFileResponse converts a domain File entity to the public FileResponse DTO.
 func toFileResponse(f *entity.File) *FileResponse {
 	resp := &FileResponse{
 		ID:            f.ID.String(),
@@ -778,7 +739,6 @@ func toFileResponse(f *entity.File) *FileResponse {
 	return resp
 }
 
-// toFileVersionResponse converts a domain FileVersion entity to its DTO.
 func toFileVersionResponse(v *entity.FileVersion) *FileVersionResponse {
 	return &FileVersionResponse{
 		ID:         v.ID.String(),
@@ -792,11 +752,6 @@ func toFileVersionResponse(v *entity.FileVersion) *FileVersionResponse {
 	}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DownloadByShareToken
-// ─────────────────────────────────────────────────────────────────────────────
-
-// DownloadByShareToken streams a file identified by a public share token.
 func (uc *useCaseImpl) DownloadByShareToken(ctx context.Context, token string) (io.ReadCloser, *FileResponse, error) {
 	shareLink, err := uc.permRepo.GetShareLinkByToken(ctx, token)
 	if err != nil || shareLink == nil {

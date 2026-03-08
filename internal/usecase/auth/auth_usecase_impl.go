@@ -20,7 +20,6 @@ type useCaseImpl struct {
 	jwtService pkgjwt.JWTService
 }
 
-// NewUseCase constructs the auth UseCase implementation.
 func NewUseCase(userRepo repository.UserRepository, jwtService pkgjwt.JWTService) UseCase {
 	return &useCaseImpl{
 		userRepo:   userRepo,
@@ -28,13 +27,10 @@ func NewUseCase(userRepo repository.UserRepository, jwtService pkgjwt.JWTService
 	}
 }
 
-// Register creates a new user and returns a token pair.
 func (uc *useCaseImpl) Register(ctx context.Context, req *RegisterRequest) (*AuthResponse, error) {
-	// Check for duplicate email
 	if existing, _ := uc.userRepo.GetByEmail(ctx, req.Email); existing != nil {
 		return nil, errors.Conflict("email already in use")
 	}
-	// Check for duplicate username
 	if existing, _ := uc.userRepo.GetByUsername(ctx, req.Username); existing != nil {
 		return nil, errors.Conflict("username already taken")
 	}
@@ -66,7 +62,6 @@ func (uc *useCaseImpl) Register(ctx context.Context, req *RegisterRequest) (*Aut
 	return uc.buildAuthResponse(ctx, user)
 }
 
-// Login authenticates the user and records the login event.
 func (uc *useCaseImpl) Login(ctx context.Context, req *LoginRequest, ip, userAgent string) (*AuthResponse, error) {
 	user, err := uc.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil || user == nil {
@@ -98,7 +93,7 @@ func (uc *useCaseImpl) Login(ctx context.Context, req *LoginRequest, ip, userAge
 		TokenHash: tokenHash,
 		IPAddress: ip,
 		UserAgent: userAgent,
-		ExpiresAt: resp.ExpiresAt.Add(30 * 24 * time.Hour), // refresh expiry
+		ExpiresAt: resp.ExpiresAt.Add(30 * 24 * time.Hour),
 		CreatedAt: time.Now(),
 	}
 	if err := uc.userRepo.CreateRefreshToken(ctx, rt); err != nil {
@@ -109,7 +104,6 @@ func (uc *useCaseImpl) Login(ctx context.Context, req *LoginRequest, ip, userAge
 	return resp, nil
 }
 
-// RefreshToken validates an existing refresh token and issues a new pair.
 func (uc *useCaseImpl) RefreshToken(ctx context.Context, req *RefreshTokenRequest) (*AuthResponse, error) {
 	claims, err := uc.jwtService.ValidateToken(req.RefreshToken, pkgjwt.RefreshToken)
 	if err != nil {
@@ -161,7 +155,6 @@ func (uc *useCaseImpl) RefreshToken(ctx context.Context, req *RefreshTokenReques
 	return resp, nil
 }
 
-// Logout revokes the given refresh token.
 func (uc *useCaseImpl) Logout(ctx context.Context, refreshToken string) error {
 	tokenHash := crypto.HashSHA256(refreshToken)
 	if err := uc.userRepo.RevokeRefreshToken(ctx, tokenHash); err != nil {
@@ -170,7 +163,6 @@ func (uc *useCaseImpl) Logout(ctx context.Context, refreshToken string) error {
 	return nil
 }
 
-// LogoutAll revokes all sessions for the user.
 func (uc *useCaseImpl) LogoutAll(ctx context.Context, userID string) error {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -183,7 +175,6 @@ func (uc *useCaseImpl) LogoutAll(ctx context.Context, userID string) error {
 	return nil
 }
 
-// ChangePassword verifies the old password, sets the new one, and revokes all sessions.
 func (uc *useCaseImpl) ChangePassword(ctx context.Context, userID string, req *ChangePasswordRequest) error {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -219,7 +210,6 @@ func (uc *useCaseImpl) ChangePassword(ctx context.Context, userID string, req *C
 	return nil
 }
 
-// GetProfile returns the public profile of a user.
 func (uc *useCaseImpl) GetProfile(ctx context.Context, userID string) (*UserResponse, error) {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -232,7 +222,6 @@ func (uc *useCaseImpl) GetProfile(ctx context.Context, userID string) (*UserResp
 	return toUserResponse(user), nil
 }
 
-// UpdateProfile applies the given changes to the user's profile.
 func (uc *useCaseImpl) UpdateProfile(ctx context.Context, userID string, req *UpdateProfileRequest) (*UserResponse, error) {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -259,7 +248,6 @@ func (uc *useCaseImpl) UpdateProfile(ctx context.Context, userID string, req *Up
 	return toUserResponse(user), nil
 }
 
-// buildAuthResponse generates a TokenPair and assembles the AuthResponse.
 func (uc *useCaseImpl) buildAuthResponse(ctx context.Context, user *entity.User) (*AuthResponse, error) {
 	pair, err := uc.jwtService.GenerateTokenPair(user.ID, user.Email, string(user.Role))
 	if err != nil {
@@ -274,7 +262,6 @@ func (uc *useCaseImpl) buildAuthResponse(ctx context.Context, user *entity.User)
 	}, nil
 }
 
-// toUserResponse converts a domain User entity to the public UserResponse DTO.
 func toUserResponse(u *entity.User) *UserResponse {
 	return &UserResponse{
 		ID:            u.ID.String(),

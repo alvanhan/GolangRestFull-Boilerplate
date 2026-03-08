@@ -27,7 +27,6 @@ type useCaseImpl struct {
 	notif      NotificationSender
 }
 
-// NewUseCase constructs the folder UseCase implementation.
 func NewUseCase(
 	folderRepo repository.FolderRepository,
 	permRepo repository.PermissionRepository,
@@ -42,7 +41,6 @@ func NewUseCase(
 	}
 }
 
-// Create makes a new folder under an optional parent.
 func (uc *useCaseImpl) Create(
 	ctx context.Context,
 	ownerID string,
@@ -102,7 +100,6 @@ func (uc *useCaseImpl) Create(
 	return toFolderResponse(folder, 0, 0), nil
 }
 
-// GetByID returns a folder the caller has at least read access to.
 func (uc *useCaseImpl) GetByID(
 	ctx context.Context,
 	userID, folderID string,
@@ -114,7 +111,6 @@ func (uc *useCaseImpl) GetByID(
 	return toFolderResponse(folder, folder.FolderCount, folder.FileCount), nil
 }
 
-// Update applies partial changes to a folder.
 func (uc *useCaseImpl) Update(
 	ctx context.Context,
 	userID, folderID string,
@@ -142,7 +138,6 @@ func (uc *useCaseImpl) Update(
 	return toFolderResponse(folder, folder.FolderCount, folder.FileCount), nil
 }
 
-// Delete recursively removes a folder and all its contents.
 func (uc *useCaseImpl) Delete(ctx context.Context, userID, folderID string) error {
 	folder, err := uc.resolveFolderWithAccess(ctx, userID, folderID, entity.ActionDelete)
 	if err != nil {
@@ -154,14 +149,12 @@ func (uc *useCaseImpl) Delete(ctx context.Context, userID, folderID string) erro
 		return errors.InternalServer(err)
 	}
 
-	// Decrement parent's counts.
 	if folder.ParentID != nil {
 		_ = uc.folderRepo.UpdateCounts(ctx, *folder.ParentID, 0, -1, -folder.Size)
 	}
 	return nil
 }
 
-// Move relocates a folder under a new parent.
 func (uc *useCaseImpl) Move(
 	ctx context.Context,
 	userID, folderID string,
@@ -189,7 +182,6 @@ func (uc *useCaseImpl) Move(
 		return nil, errors.InternalServer(err)
 	}
 
-	// Update counters on old and new parent.
 	if folder.ParentID != nil {
 		_ = uc.folderRepo.UpdateCounts(ctx, *folder.ParentID, 0, -1, -folder.Size)
 	}
@@ -202,7 +194,6 @@ func (uc *useCaseImpl) Move(
 	return toFolderResponse(folder, folder.FolderCount, folder.FileCount), nil
 }
 
-// List returns the immediate children of a folder.
 func (uc *useCaseImpl) List(
 	ctx context.Context,
 	userID string,
@@ -237,7 +228,6 @@ func (uc *useCaseImpl) List(
 	return resp, nil
 }
 
-// GetTree returns the full recursive subtree.
 func (uc *useCaseImpl) GetTree(
 	ctx context.Context,
 	userID string,
@@ -265,7 +255,6 @@ func (uc *useCaseImpl) GetTree(
 	return buildTree(allFolders, rootID), nil
 }
 
-// GetBreadcrumb returns the ancestor chain from root to folderID.
 func (uc *useCaseImpl) GetBreadcrumb(
 	ctx context.Context,
 	userID, folderID string,
@@ -294,7 +283,6 @@ func (uc *useCaseImpl) GetBreadcrumb(
 	return chain, nil
 }
 
-// Share creates a share link for a folder.
 func (uc *useCaseImpl) Share(
 	ctx context.Context,
 	userID, folderID string,
@@ -352,10 +340,6 @@ func (uc *useCaseImpl) Share(
 		CreatedAt: now,
 	}, nil
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 func (uc *useCaseImpl) resolveFolderWithAccess(
 	ctx context.Context,
@@ -420,7 +404,6 @@ func buildTree(all []*entity.Folder, rootID *uuid.UUID) *FolderTreeResponse {
 	return root
 }
 
-// toFolderResponse converts a domain Folder entity to the public FolderResponse DTO.
 func toFolderResponse(f *entity.Folder, childrenCount, fileCount int64) *FolderResponse {
 	resp := &FolderResponse{
 		ID:            f.ID.String(),

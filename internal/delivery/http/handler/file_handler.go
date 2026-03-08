@@ -15,14 +15,12 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// FileHandler handles file-related HTTP requests.
 type FileHandler struct {
 	fileUC    file.UseCase
 	validator *validator.Validator
 	uploadCfg *config.UploadConfig
 }
 
-// NewFileHandler creates a new FileHandler.
 func NewFileHandler(fileUC file.UseCase, v *validator.Validator, uploadCfg *config.UploadConfig) *FileHandler {
 	return &FileHandler{fileUC: fileUC, validator: v, uploadCfg: uploadCfg}
 }

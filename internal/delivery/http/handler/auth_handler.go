@@ -9,13 +9,11 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// AuthHandler handles authentication-related HTTP requests.
 type AuthHandler struct {
 	authUC    auth.UseCase
 	validator *validator.Validator
 }
 
-// NewAuthHandler creates a new AuthHandler.
 func NewAuthHandler(authUC auth.UseCase, v *validator.Validator) *AuthHandler {
 	return &AuthHandler{authUC: authUC, validator: v}
 }

@@ -26,17 +26,14 @@ func (e *AppError) Unwrap() error { return e.Err }
 
 func (e *AppError) HTTPStatus() int { return e.Code }
 
-// New creates an AppError with the given HTTP status code and message.
 func New(code int, message string) *AppError {
 	return &AppError{Code: code, Message: message}
 }
 
-// Wrap creates an AppError that wraps an existing error.
 func Wrap(code int, message string, err error) *AppError {
 	return &AppError{Code: code, Message: message, Err: err}
 }
 
-// NotFound returns a 404 error for a missing resource.
 func NotFound(resource string) *AppError {
 	return &AppError{
 		Code:    http.StatusNotFound,
@@ -45,7 +42,6 @@ func NotFound(resource string) *AppError {
 	}
 }
 
-// Unauthorized returns a 401 error.
 func Unauthorized(message string) *AppError {
 	return &AppError{
 		Code:    http.StatusUnauthorized,
@@ -54,7 +50,6 @@ func Unauthorized(message string) *AppError {
 	}
 }
 
-// Forbidden returns a 403 error for a disallowed action.
 func Forbidden(action string) *AppError {
 	return &AppError{
 		Code:    http.StatusForbidden,
@@ -63,7 +58,6 @@ func Forbidden(action string) *AppError {
 	}
 }
 
-// BadRequest returns a 400 error.
 func BadRequest(message string) *AppError {
 	return &AppError{
 		Code:    http.StatusBadRequest,
@@ -72,7 +66,6 @@ func BadRequest(message string) *AppError {
 	}
 }
 
-// Conflict returns a 409 error.
 func Conflict(message string) *AppError {
 	return &AppError{
 		Code:    http.StatusConflict,
@@ -81,7 +74,6 @@ func Conflict(message string) *AppError {
 	}
 }
 
-// InternalServer returns a 500 error wrapping the original cause.
 func InternalServer(err error) *AppError {
 	return &AppError{
 		Code:    http.StatusInternalServerError,
@@ -90,7 +82,6 @@ func InternalServer(err error) *AppError {
 	}
 }
 
-// UnprocessableEntity returns a 422 error.
 func UnprocessableEntity(message string) *AppError {
 	return &AppError{
 		Code:    http.StatusUnprocessableEntity,
@@ -99,7 +90,6 @@ func UnprocessableEntity(message string) *AppError {
 	}
 }
 
-// TooManyRequests returns a 429 error.
 func TooManyRequests() *AppError {
 	return &AppError{
 		Code:    http.StatusTooManyRequests,
@@ -107,7 +97,6 @@ func TooManyRequests() *AppError {
 	}
 }
 
-// StorageQuotaExceeded returns a 413 error when the user's quota is full.
 func StorageQuotaExceeded() *AppError {
 	return &AppError{
 		Code:    http.StatusRequestEntityTooLarge,
@@ -116,7 +105,6 @@ func StorageQuotaExceeded() *AppError {
 	}
 }
 
-// FileTooBig returns a 413 error when an uploaded file exceeds the allowed size.
 func FileTooBig(maxSize int64) *AppError {
 	return &AppError{
 		Code:    http.StatusRequestEntityTooLarge,
@@ -147,8 +135,6 @@ func Is(err, target error) bool { return errors.Is(err, target) }
 // As delegates to the standard library so callers need not import "errors" separately.
 func As(err error, target interface{}) bool { return errors.As(err, &target) }
 
-// IsAppError checks whether err (or any error in its chain) is an *AppError and
-// returns it along with a boolean indicating success.
 func IsAppError(err error) (*AppError, bool) {
 	var e *AppError
 	if errors.As(err, &e) {

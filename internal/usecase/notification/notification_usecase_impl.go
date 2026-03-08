@@ -19,12 +19,10 @@ type useCaseImpl struct {
 	notifRepo repository.NotificationRepository
 }
 
-// NewUseCase constructs the notification UseCase implementation.
 func NewUseCase(notifRepo repository.NotificationRepository) UseCase {
 	return &useCaseImpl{notifRepo: notifRepo}
 }
 
-// List returns paginated notifications for a user.
 func (uc *useCaseImpl) List(
 	ctx context.Context,
 	userID string,
@@ -56,7 +54,6 @@ func (uc *useCaseImpl) List(
 	}, nil
 }
 
-// MarkAsRead marks a single notification as read for the given user.
 func (uc *useCaseImpl) MarkAsRead(
 	ctx context.Context,
 	userID, notificationID string,
@@ -70,7 +67,6 @@ func (uc *useCaseImpl) MarkAsRead(
 		return errors.BadRequest("invalid notification ID")
 	}
 
-	// Verify ownership.
 	notif, err := uc.notifRepo.GetByID(ctx, nid)
 	if err != nil || notif == nil {
 		return errors.NotFound("notification")
@@ -85,7 +81,6 @@ func (uc *useCaseImpl) MarkAsRead(
 	return nil
 }
 
-// MarkAllAsRead marks every unread notification for the user as read.
 func (uc *useCaseImpl) MarkAllAsRead(ctx context.Context, userID string) error {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -97,7 +92,6 @@ func (uc *useCaseImpl) MarkAllAsRead(ctx context.Context, userID string) error {
 	return nil
 }
 
-// Delete permanently removes a notification that belongs to the user.
 func (uc *useCaseImpl) Delete(
 	ctx context.Context,
 	userID, notificationID string,
@@ -125,7 +119,6 @@ func (uc *useCaseImpl) Delete(
 	return nil
 }
 
-// GetUnreadCount returns the count of unread notifications for the user.
 func (uc *useCaseImpl) GetUnreadCount(
 	ctx context.Context,
 	userID string,
@@ -140,10 +133,6 @@ func (uc *useCaseImpl) GetUnreadCount(
 	}
 	return &UnreadCountResponse{Count: count}, nil
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper
-// ─────────────────────────────────────────────────────────────────────────────
 
 func toNotificationResponse(n *entity.Notification) *NotificationResponse {
 	resp := &NotificationResponse{

@@ -20,7 +20,6 @@ type PermissionRepository interface {
 	GrantBulk(ctx context.Context, permissions []*entity.Permission) error
 	RevokeBulk(ctx context.Context, ids []uuid.UUID) error
 
-	// Share link management
 	CreateShareLink(ctx context.Context, link *entity.ShareLink) error
 	GetShareLink(ctx context.Context, id uuid.UUID) (*entity.ShareLink, error)
 	GetShareLinkByToken(ctx context.Context, token string) (*entity.ShareLink, error)

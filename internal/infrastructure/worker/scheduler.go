@@ -19,9 +19,7 @@ func NewScheduler(client *Client) *Scheduler {
 	}
 }
 
-// RegisterJobs adds all periodic background tasks to the cron scheduler.
 func (s *Scheduler) RegisterJobs() {
-	// cleanup expired share links every hour
 	s.addJob("@every 1h", func() {
 		task, err := NewExpiredLinkCleanupTask()
 		if err != nil {
@@ -33,7 +31,6 @@ func (s *Scheduler) RegisterJobs() {
 		}
 	})
 
-	// cleanup expired upload chunks every 6 hours
 	s.addJob("@every 6h", func() {
 		task, err := NewChunkCleanupTask()
 		if err != nil {
@@ -45,7 +42,6 @@ func (s *Scheduler) RegisterJobs() {
 		}
 	})
 
-	// generate storage report daily
 	s.addJob("@daily", func() {
 		task, err := NewStorageReportTask()
 		if err != nil {
@@ -69,7 +65,6 @@ func (s *Scheduler) RegisterJobs() {
 		}
 	})
 
-	// cleanup orphaned temp files every 30 minutes
 	s.addJob("@every 30m", func() {
 		task, err := NewFileCleanupTask(&FileCleanupPayload{})
 		if err != nil {

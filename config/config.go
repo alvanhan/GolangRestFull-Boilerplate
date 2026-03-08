@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config is the root configuration container.
 type Config struct {
 	App       AppConfig
 	Database  DatabaseConfig
@@ -24,7 +23,6 @@ type Config struct {
 	CORS      CORSConfig
 }
 
-// AppConfig holds general application settings.
 type AppConfig struct {
 	Name   string
 	Env    string
@@ -32,13 +30,10 @@ type AppConfig struct {
 	Secret string
 }
 
-// IsProduction returns true when running in production mode.
 func (a *AppConfig) IsProduction() bool { return a.Env == "production" }
 
-// IsDevelopment returns true when running in development mode.
 func (a *AppConfig) IsDevelopment() bool { return a.Env == "development" }
 
-// DatabaseConfig holds PostgreSQL connection settings.
 type DatabaseConfig struct {
 	Host         string
 	Port         int
@@ -51,7 +46,6 @@ type DatabaseConfig struct {
 	MaxLifetime  time.Duration
 }
 
-// GetDSN constructs a PostgreSQL DSN string for GORM/pgx.
 func (d *DatabaseConfig) GetDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
@@ -59,7 +53,6 @@ func (d *DatabaseConfig) GetDSN() string {
 	)
 }
 
-// RedisConfig holds Redis connection settings.
 type RedisConfig struct {
 	Host     string
 	Port     int
@@ -68,12 +61,10 @@ type RedisConfig struct {
 	PoolSize int
 }
 
-// GetRedisAddr returns the Redis host:port address string.
 func (r *RedisConfig) GetRedisAddr() string {
 	return fmt.Sprintf("%s:%d", r.Host, r.Port)
 }
 
-// JWTConfig holds JWT signing keys and token lifetimes.
 type JWTConfig struct {
 	AccessSecret  string
 	RefreshSecret string
@@ -81,7 +72,6 @@ type JWTConfig struct {
 	RefreshExpiry time.Duration
 }
 
-// MinIOConfig holds MinIO / S3-compatible object storage settings.
 type MinIOConfig struct {
 	Endpoint   string
 	AccessKey  string
@@ -91,7 +81,6 @@ type MinIOConfig struct {
 	Region     string
 }
 
-// UploadConfig holds file upload constraints.
 type UploadConfig struct {
 	MaxSize      int64
 	ChunkSize    int64
@@ -99,27 +88,23 @@ type UploadConfig struct {
 	AllowedTypes []string
 }
 
-// RateLimitConfig holds API rate limiting settings.
 type RateLimitConfig struct {
 	Max    int
 	Expiry time.Duration
 }
 
-// LogConfig holds structured logging settings.
 type LogConfig struct {
 	Level  string
 	Format string
 	Output string
 }
 
-// WorkerConfig holds Asynq background worker settings.
 type WorkerConfig struct {
 	Concurrency   int
 	QueueDefault  string
 	QueueCritical string
 }
 
-// CORSConfig holds Cross-Origin Resource Sharing settings.
 type CORSConfig struct {
 	AllowedOrigins []string
 	AllowedMethods []string
@@ -166,7 +151,6 @@ func Load() *Config {
 	return instance
 }
 
-// Get returns the singleton Config instance, calling Load if needed.
 func Get() *Config {
 	if instance == nil {
 		return Load()
@@ -174,7 +158,6 @@ func Get() *Config {
 	return instance
 }
 
-// setDefaults registers sane defaults for every configuration key.
 func setDefaults(v *viper.Viper) {
 	v.SetDefault("app.name", "file-management-service")
 	v.SetDefault("app.env", "development")
@@ -285,7 +268,6 @@ func bindEnvVars(v *viper.Viper) {
 	}
 }
 
-// buildConfig constructs a Config from the viper instance.
 func buildConfig(v *viper.Viper) (*Config, error) {
 	cfg := &Config{}
 
@@ -365,7 +347,6 @@ func buildConfig(v *viper.Viper) (*Config, error) {
 	return cfg, nil
 }
 
-// validate checks that all required configuration values are present.
 func validate(cfg *Config) error {
 	type check struct {
 		val  string
@@ -434,7 +415,6 @@ func parseDuration(s string, fallback time.Duration) time.Duration {
 	return d
 }
 
-// splitCSV splits a comma-separated string into a trimmed, non-empty slice.
 func splitCSV(s string) []string {
 	if strings.TrimSpace(s) == "" {
 		return []string{}

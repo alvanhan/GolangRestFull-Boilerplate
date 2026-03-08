@@ -72,7 +72,6 @@ func FormatFileSize(bytes int64) string {
 	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
-// IsAllowedMimeType reports whether mimeType is found in the allowed list.
 func IsAllowedMimeType(mimeType string, allowed []string) bool {
 	for _, a := range allowed {
 		if strings.EqualFold(a, mimeType) {
@@ -131,7 +130,6 @@ func TruncateString(s string, max int) string {
 	return string(runes[:max]) + "…"
 }
 
-// SliceContains reports whether item is present in slice.
 func SliceContains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
@@ -140,8 +138,6 @@ func SliceContains(slice []string, item string) bool {
 	}
 	return false
 }
-
-// Pointer helpers
 
 func PtrString(s string) *string   { return &s }
 func PtrTime(t time.Time) *time.Time { return &t }

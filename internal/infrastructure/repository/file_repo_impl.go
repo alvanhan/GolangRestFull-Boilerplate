@@ -67,7 +67,6 @@ func (r *fileRepository) Update(ctx context.Context, file *entity.File) error {
 	return nil
 }
 
-// Delete permanently removes the file record from the database.
 func (r *fileRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	result := r.db.WithContext(ctx).
 		Unscoped().
@@ -81,7 +80,6 @@ func (r *fileRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// SoftDelete marks the file as deleted by setting deleted_at.
 func (r *fileRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 	now := time.Now()
 	result := r.db.WithContext(ctx).
@@ -185,7 +183,6 @@ func (r *fileRepository) IncrementDownloadCount(ctx context.Context, id uuid.UUI
 	return nil
 }
 
-// Search finds files whose name, original name, or description matches query (case-insensitive).
 func (r *fileRepository) Search(ctx context.Context, query string, filter domrepo.FileFilter) ([]*entity.File, int64, error) {
 	pattern := "%" + query + "%"
 	q := r.applyFilter(
@@ -261,7 +258,6 @@ func (r *fileRepository) DeleteChunks(ctx context.Context, uploadID string) erro
 	return nil
 }
 
-// applyFilter applies all non-zero FileFilter fields to the query.
 func (r *fileRepository) applyFilter(query *gorm.DB, f domrepo.FileFilter) *gorm.DB {
 	if f.OwnerID != nil {
 		query = query.Where("owner_id = ?", *f.OwnerID)

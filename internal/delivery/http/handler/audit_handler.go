@@ -16,13 +16,11 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// AuditHandler handles audit log HTTP requests.
 type AuditHandler struct {
 	auditRepo domrepo.AuditRepository
 	validator *validator.Validator
 }
 
-// NewAuditHandler creates a new AuditHandler.
 func NewAuditHandler(auditRepo domrepo.AuditRepository, v *validator.Validator) *AuditHandler {
 	return &AuditHandler{auditRepo: auditRepo, validator: v}
 }

@@ -7,15 +7,12 @@ import (
 	"file-management-service/pkg/response"
 )
 
-// RBACMiddleware enforces role-based access control.
 type RBACMiddleware struct{}
 
-// NewRBACMiddleware creates a new RBACMiddleware.
 func NewRBACMiddleware() *RBACMiddleware {
 	return &RBACMiddleware{}
 }
 
-// RequireRole ensures the authenticated user has one of the listed roles.
 func (m *RBACMiddleware) RequireRole(roles ...entity.UserRole) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userRole := GetUserRole(c)
@@ -31,7 +28,6 @@ func (m *RBACMiddleware) RequireRole(roles ...entity.UserRole) fiber.Handler {
 	}
 }
 
-// RequireMinRole ensures the user's role level is at least minRole.
 func (m *RBACMiddleware) RequireMinRole(minRole entity.UserRole) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userRole := GetUserRole(c)
@@ -45,17 +41,14 @@ func (m *RBACMiddleware) RequireMinRole(minRole entity.UserRole) fiber.Handler {
 	}
 }
 
-// RequireSuperAdmin allows only super_admin users.
 func (m *RBACMiddleware) RequireSuperAdmin() fiber.Handler {
 	return m.RequireRole(entity.RoleSuperAdmin)
 }
 
-// RequireAdmin allows admin and super_admin users.
 func (m *RBACMiddleware) RequireAdmin() fiber.Handler {
 	return m.RequireMinRole(entity.RoleAdmin)
 }
 
-// RequireManager allows manager and above.
 func (m *RBACMiddleware) RequireManager() fiber.Handler {
 	return m.RequireMinRole(entity.RoleManager)
 }

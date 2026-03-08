@@ -9,13 +9,11 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// FolderHandler handles folder-related HTTP requests.
 type FolderHandler struct {
 	folderUC  folder.UseCase
 	validator *validator.Validator
 }
 
-// NewFolderHandler creates a new FolderHandler.
 func NewFolderHandler(folderUC folder.UseCase, v *validator.Validator) *FolderHandler {
 	return &FolderHandler{folderUC: folderUC, validator: v}
 }

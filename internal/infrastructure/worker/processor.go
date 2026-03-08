@@ -49,7 +49,6 @@ func NewProcessor(cfg *config.WorkerConfig, redisOpt asynq.RedisClientOpt) *Proc
 	}
 }
 
-// RegisterHandlers wires all task types to their handler functions.
 func (p *Processor) RegisterHandlers(fileHandler *FileProcessingHandler, notifHandler *NotificationHandler) {
 	p.mux.HandleFunc(TypeFileProcessing, fileHandler.ProcessTask)
 	p.mux.HandleFunc(TypeFileCleanup, handleFileCleanup)

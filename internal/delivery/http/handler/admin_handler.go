@@ -11,14 +11,12 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// AdminHandler handles admin-only user management and stats.
 type AdminHandler struct {
 	userRepo  domrepo.UserRepository
 	fileRepo  domrepo.FileRepository
 	validator *validator.Validator
 }
 
-// NewAdminHandler creates a new AdminHandler.
 func NewAdminHandler(userRepo domrepo.UserRepository, fileRepo domrepo.FileRepository, v *validator.Validator) *AdminHandler {
 	return &AdminHandler{userRepo: userRepo, fileRepo: fileRepo, validator: v}
 }
@@ -244,7 +242,6 @@ func (h *AdminHandler) BanUser(c *fiber.Ctx) error {
 func (h *AdminHandler) GetStats(c *fiber.Ctx) error {
 	ctx := c.Context()
 
-	// Total users by role.
 	activeStatus := entity.StatusActive
 	users, totalUsers, err := h.userRepo.List(ctx, domrepo.UserFilter{
 		Status: &activeStatus, Page: 1, PageSize: 1,
@@ -254,7 +251,6 @@ func (h *AdminHandler) GetStats(c *fiber.Ctx) error {
 		return handleError(c, err)
 	}
 
-	// Total files.
 	files, totalFiles, err := h.fileRepo.List(ctx, domrepo.FileFilter{Page: 1, PageSize: 1})
 	_ = files
 	if err != nil {

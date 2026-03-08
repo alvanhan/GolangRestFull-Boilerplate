@@ -23,11 +23,9 @@ type FileRepository interface {
 	IncrementDownloadCount(ctx context.Context, id uuid.UUID) error
 	Search(ctx context.Context, query string, filter FileFilter) ([]*entity.File, int64, error)
 
-	// File versioning
 	CreateVersion(ctx context.Context, version *entity.FileVersion) error
 	GetVersions(ctx context.Context, fileID uuid.UUID) ([]*entity.FileVersion, error)
 
-	// Chunked upload tracking
 	CreateChunk(ctx context.Context, chunk *entity.FileChunk) error
 	GetChunks(ctx context.Context, uploadID string) ([]*entity.FileChunk, error)
 	GetChunksByUploadID(ctx context.Context, uploadID string) ([]*entity.FileChunk, error)

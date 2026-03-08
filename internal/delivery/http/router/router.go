@@ -19,7 +19,6 @@ import (
 	"file-management-service/internal/delivery/http/middleware"
 )
 
-// Router wires all HTTP routes and middleware for the Fiber application.
 type Router struct {
 	cfg           *config.Config
 	authHandler   *handler.AuthHandler
@@ -34,7 +33,6 @@ type Router struct {
 	redisClient   *redis.Client
 }
 
-// NewRouter creates a Router with all dependencies injected.
 func NewRouter(
 	cfg *config.Config,
 	authHandler *handler.AuthHandler,
@@ -63,7 +61,6 @@ func NewRouter(
 	}
 }
 
-// Setup creates and configures the Fiber application.
 func (r *Router) Setup() *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:           r.cfg.App.Name,
@@ -112,10 +109,8 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	auth := r.authMW.Authenticate()
 	requireAdmin := r.rbacMW.RequireAdmin()
 
-	// Swagger UI
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
-	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status":    "ok",
@@ -126,7 +121,6 @@ func (r *Router) registerRoutes(app *fiber.App) {
 
 	v1 := app.Group("/api/v1")
 
-	// ─── Auth ──────────────────────────────────────────────────────────────────
 	authGroup := v1.Group("/auth")
 	authGroup.Post("/register", r.authHandler.Register)
 	authGroup.Post("/login", r.authHandler.Login)
@@ -137,10 +131,8 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	authGroup.Get("/me", auth, r.authHandler.GetProfile)
 	authGroup.Put("/me", auth, r.authHandler.UpdateProfile)
 
-	// ─── Public share links ────────────────────────────────────────────────────
 	v1.Get("/share/:token", r.fileHandler.DownloadByShareToken)
 
-	// ─── Files ─────────────────────────────────────────────────────────────────
 	files := v1.Group("/files", auth)
 	files.Get("/search", r.fileHandler.Search)
 	files.Post("/upload", r.fileHandler.Upload)
@@ -159,7 +151,6 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	files.Get("/:id/versions", r.fileHandler.GetVersions)
 	files.Post("/:id/versions/:ver/restore", r.fileHandler.RestoreVersion)
 
-	// ─── Folders ───────────────────────────────────────────────────────────────
 	folders := v1.Group("/folders", auth)
 	folders.Post("", r.folderHandler.Create)
 	folders.Get("", r.folderHandler.List)
@@ -171,7 +162,6 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	folders.Get("/:id/breadcrumb", r.folderHandler.GetBreadcrumb)
 	folders.Post("/:id/share", r.folderHandler.Share)
 
-	// ─── Permissions ───────────────────────────────────────────────────────────
 	perms := v1.Group("/permissions", auth)
 	perms.Post("", r.permHandler.Grant)
 	perms.Post("/bulk", r.permHandler.GrantBulk)
@@ -179,7 +169,6 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	perms.Post("/check", r.permHandler.Check)
 	perms.Delete("/:id", r.permHandler.Revoke)
 
-	// ─── Notifications ─────────────────────────────────────────────────────────
 	notifs := v1.Group("/notifications", auth)
 	notifs.Get("", r.notifHandler.List)
 	notifs.Get("/count", r.notifHandler.GetUnreadCount)
@@ -188,13 +177,11 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	notifs.Patch("/:id/read", r.notifHandler.MarkAsRead)
 	notifs.Delete("/:id", r.notifHandler.Delete)
 
-	// ─── Audit logs ────────────────────────────────────────────────────────────
 	auditGroup := v1.Group("/audit-logs", auth, requireAdmin)
 	auditGroup.Get("", r.auditHandler.List)
 	auditGroup.Get("/export", r.auditHandler.Export)
 	auditGroup.Get("/:id", r.auditHandler.GetByID)
 
-	// ─── Admin ─────────────────────────────────────────────────────────────────
 	adminGroup := v1.Group("/admin", auth, requireAdmin)
 	adminGroup.Get("/stats", r.adminHandler.GetStats)
 	adminGroup.Get("/users", r.adminHandler.ListUsers)
@@ -205,7 +192,6 @@ func (r *Router) registerRoutes(app *fiber.App) {
 	adminGroup.Post("/users/:id/ban", r.adminHandler.BanUser)
 }
 
-// errorHandler is the global Fiber error handler.
 func errorHandler(c *fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError
 	msg := "internal server error"

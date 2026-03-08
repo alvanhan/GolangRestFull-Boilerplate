@@ -9,13 +9,11 @@ import (
 	"file-management-service/pkg/validator"
 )
 
-// PermissionHandler handles permission-related HTTP requests.
 type PermissionHandler struct {
 	permUC    permission.UseCase
 	validator *validator.Validator
 }
 
-// NewPermissionHandler creates a new PermissionHandler.
 func NewPermissionHandler(permUC permission.UseCase, v *validator.Validator) *PermissionHandler {
 	return &PermissionHandler{permUC: permUC, validator: v}
 }

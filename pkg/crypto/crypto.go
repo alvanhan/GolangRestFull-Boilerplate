@@ -10,7 +10,6 @@ import (
 
 const bcryptCost = 12
 
-// HashPassword hashes a plain-text password using bcrypt.
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
 	if err != nil {
@@ -19,7 +18,6 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
-// CheckPassword compares a plain-text password against a bcrypt hash.
 func CheckPassword(password, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
@@ -40,7 +38,6 @@ func GenerateSecureToken(length int) (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-// GenerateRandomBytes returns n cryptographically-random bytes.
 func GenerateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {

@@ -32,7 +32,6 @@ func (c *Client) EnqueueNotification(payload *SendNotificationPayload, opts ...a
 	return err
 }
 
-// Enqueue submits any pre-built asynq.Task to the queue.
 func (c *Client) Enqueue(task *asynq.Task, opts ...asynq.Option) error {
 	if _, err := c.client.Enqueue(task, opts...); err != nil {
 		return fmt.Errorf("enqueueing task %q: %w", task.Type(), err)

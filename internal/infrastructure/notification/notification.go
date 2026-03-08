@@ -25,7 +25,6 @@ func NewPublisher(client *redis.Client) *Publisher {
 	return &Publisher{client: client}
 }
 
-// Publish marshals the event and publishes it to the user's notification channel.
 func (p *Publisher) Publish(ctx context.Context, event *entity.NotificationEvent) error {
 	data, err := json.Marshal(event)
 	if err != nil {
@@ -44,18 +43,15 @@ func (p *Publisher) Publish(ctx context.Context, event *entity.NotificationEvent
 	return nil
 }
 
-// Subscribe returns a PubSub handle for the given user's notification channel.
 func (p *Publisher) Subscribe(ctx context.Context, userID string) *redis.PubSub {
 	return p.client.Subscribe(ctx, p.UserChannel(userID))
 }
 
-// UserChannel returns the Redis channel name for the given user ID.
 func (p *Publisher) UserChannel(userID string) string {
 	return fmt.Sprintf(notificationChannel, userID)
 }
 
-// Send creates a NotificationEvent and publishes it to the user's channel.
-// This method satisfies the NotificationService interface used by file/folder/permission use cases.
+// Send satisfies the NotificationService interface used by file/folder/permission use cases.
 func (p *Publisher) Send(
 	ctx context.Context,
 	userID uuid.UUID,

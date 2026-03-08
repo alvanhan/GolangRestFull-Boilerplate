@@ -72,7 +72,6 @@ func (r *folderRepository) Update(ctx context.Context, folder *entity.Folder) er
 	return nil
 }
 
-// Delete permanently removes the folder record.
 func (r *folderRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	result := r.db.WithContext(ctx).
 		Unscoped().
@@ -86,7 +85,6 @@ func (r *folderRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// SoftDelete marks the folder as deleted by setting deleted_at.
 func (r *folderRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 	now := time.Now()
 	result := r.db.WithContext(ctx).
@@ -135,7 +133,6 @@ func (r *folderRepository) Move(ctx context.Context, folderID uuid.UUID, newPare
 		return domainerrors.Wrap(500, "failed to get folder for move", err)
 	}
 
-	// oldFullPath is used to match descendants whose path starts with this folder.
 	oldFullPath := current.Path + "/" + folderID.String()
 
 	var newParentPath string
@@ -149,11 +146,9 @@ func (r *folderRepository) Move(ctx context.Context, folderID uuid.UUID, newPare
 		}
 		newParentPath = parent.Path + "/" + parent.ID.String()
 	}
-	// newFullPath is this folder's new materialized full path.
 	newFullPath := newParentPath + "/" + folderID.String()
 
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// Update the moved folder itself.
 		if err := tx.Model(&entity.Folder{}).
 			Where("id = ? AND deleted_at IS NULL", folderID).
 			Updates(map[string]interface{}{
