@@ -41,7 +41,7 @@ This service follows **Clean Architecture** principles, separating concerns into
 │                      Domain Layer                           │
 │         Entities / Repository Interfaces / Errors           │
 ├─────────────────────────────────────────────────────────────┤
-│                  Infrastructure Layer                        │
+│                  Infrastructure Layer                       │
 │    PostgreSQL / Redis / MinIO / Worker / Scheduler / Cache  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -247,8 +247,8 @@ CORS_ALLOWED_HEADERS=Origin,Content-Type,Accept,Authorization,X-Request-ID
 ### Step 1 — Clone the repository
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone [<repository-url>](https://github.com/alvanhan/GolangRestFull-Boilerplate)
+cd [<repository-directory>](https://github.com/alvanhan/GolangRestFull-Boilerplate)
 ```
 
 ### Step 2 — Configure environment
